@@ -1,0 +1,26 @@
+# dependencies
+/node_modules
+/server/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# IntelliJ
+/.idea/shelf
+/.idea/workspace.xml
+/.idea/dataSources/
+/.idea/dataSources.local.xml
+/.idea/httpRequests/
+
+# VS Code
+**/*.code-workspace
+
+# misc
+.DS_Store
+**/.env*
+**.log*

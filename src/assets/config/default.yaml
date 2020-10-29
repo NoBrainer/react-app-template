@@ -1,0 +1,4 @@
+config:
+  optionA: true
+  optionB: "left"
+  optionC: 1234

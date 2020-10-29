@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+// Normalize process.env.* values
+normalizeEnvironmentVariables();
+
+const app = require('../app');
+const http = require('http');
+
+// Setup custom logger
+const {logger} = require('../common/logger');
+
+// Get port from environment and store in Express app
+const port = process.env.PORT;
+app.set('port', port);
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Listen on provided port, on all network interfaces
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+// Normalize environment variables and fallback to defaults
+function normalizeEnvironmentVariables() {
+	process.env.NODE_ENV = normalizeNodeEnv(process.env.NODE_ENV) || 'development';
+	process.env.PORT = normalizePort(process.env.PORT) || 3001;
+}
+
+// Normalize NODE_ENV into 'development', 'production', or false
+function normalizeNodeEnv(val) {
+	if (typeof val !== 'string') return false;
+	const value = val.toLowerCase();
+	if (value.startsWith('prod')) return 'production';
+	if (value.startsWith('dev')) return 'development';
+	return false;
+}
+
+// Normalize port into a number, string, or false
+function normalizePort(val) {
+	const port = parseInt(val, 10);
+	if (isNaN(port)) {
+		return val; //named pipe
+	} else if (port >= 0) {
+		return port; //port number
+	}
+	return false;
+}
+
+// Event listener for HTTP server "error" event
+function onError(error) {
+	if (error.syscall !== 'listen') throw error;
+	const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+	switch(error.code) {
+		case 'EACCES':
+			logger.error(bind + ' requires elevated privileges');
+			process.exit(1);
+			break;
+		case 'EADDRINUSE':
+			logger.error(bind + ' is already in use');
+			process.exit(1);
+			break;
+		default:
+			throw error;
+	}
+}
+
+// Event listener for HTTP server "listening" event
+function onListening() {
+	const addr = server.address();
+	const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+	logger.info('Listening on ' + bind);
+}
